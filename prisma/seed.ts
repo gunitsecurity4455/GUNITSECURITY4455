@@ -4,14 +4,19 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Default admin user — idempotent upsert
+  // 1. Default admin user.
+  // We overwrite the password hash on every seed so changing
+  // DEFAULT_ADMIN_PASSWORD in Vercel env vars actually takes effect on
+  // redeploy. Trade-off: until there's an in-app password-change page,
+  // a deploy will overwrite any manual hash change. That's fine for
+  // now — bootstrap > niceties.
   const adminEmail = process.env.DEFAULT_ADMIN_EMAIL ?? "admin@gunitsecurity.com.au";
   const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD ?? "ChangeMe123!";
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   await prisma.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: { passwordHash },
     create: {
       email: adminEmail,
       passwordHash,
