@@ -160,58 +160,19 @@ body::before {
   z-index: 1001;
 }
 
-.logo-mark {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, var(--red-primary), var(--blue-primary));
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.25rem;
-  color: var(--white);
-  box-shadow: 0 4px 20px rgba(200, 16, 46, 0.3);
-  position: relative;
-  overflow: hidden;
+.logo-img {
+  height: 52px;
+  width: auto;
+  transition: transform 0.3s ease;
+  display: block;
 }
 
-.logo-mark::before {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  background: var(--navy-deep);
-  border-radius: 6px;
-  z-index: 0;
+.logo:hover .logo-img {
+  transform: scale(1.05);
 }
 
-.logo-mark span {
-  position: relative;
-  z-index: 1;
-  background: linear-gradient(135deg, var(--red-bright), var(--blue-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.logo-text .brand {
-  font-size: 1.5rem;
-  letter-spacing: 3px;
-}
-
-.logo-text .tagline {
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  letter-spacing: 4px;
-  color: var(--red-bright);
-  font-weight: 500;
-  margin-top: 2px;
+.footer .logo-img {
+  height: 60px;
 }
 
 .nav-menu {
@@ -649,8 +610,8 @@ body::before {
     text-align: center;
   }
   
-  .logo-text .brand {
-    font-size: 1.1rem;
+  .logo-img {
+    height: 42px;
   }
   
   .section {
