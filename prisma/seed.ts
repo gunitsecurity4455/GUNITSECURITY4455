@@ -114,7 +114,7 @@ async function main() {
   for (const service of services) {
     await prisma.service.upsert({
       where: { slug: service.slug },
-      update: service,
+      update: {},
       create: service,
     });
   }
@@ -158,7 +158,7 @@ async function main() {
   for (const industry of industries) {
     await prisma.industry.upsert({
       where: { slug: industry.slug },
-      update: industry,
+      update: {},
       create: industry,
     });
   }
@@ -208,13 +208,11 @@ async function main() {
     },
   ];
 
-  for (const [index, testimonial] of testimonials.entries()) {
+  for (const testimonial of testimonials) {
     const existing = await prisma.testimonial.findFirst({
       where: { name: testimonial.name, role: testimonial.role },
     });
-    if (existing) {
-      await prisma.testimonial.update({ where: { id: existing.id }, data: testimonial });
-    } else {
+    if (!existing) {
       await prisma.testimonial.create({ data: testimonial });
     }
   }
@@ -261,9 +259,7 @@ async function main() {
 
   for (const value of coreValues) {
     const existing = await prisma.coreValue.findFirst({ where: { title: value.title } });
-    if (existing) {
-      await prisma.coreValue.update({ where: { id: existing.id }, data: value });
-    } else {
+    if (!existing) {
       await prisma.coreValue.create({ data: value });
     }
   }
@@ -295,9 +291,7 @@ async function main() {
 
   for (const slide of heroSlides) {
     const existing = await prisma.heroSlide.findFirst({ where: { headline: slide.headline } });
-    if (existing) {
-      await prisma.heroSlide.update({ where: { id: existing.id }, data: slide });
-    } else {
+    if (!existing) {
       await prisma.heroSlide.create({ data: slide });
     }
   }
@@ -314,9 +308,7 @@ async function main() {
 
   for (const partner of partners) {
     const existing = await prisma.partner.findFirst({ where: { name: partner.name } });
-    if (existing) {
-      await prisma.partner.update({ where: { id: existing.id }, data: partner });
-    } else {
+    if (!existing) {
       await prisma.partner.create({ data: partner });
     }
   }
