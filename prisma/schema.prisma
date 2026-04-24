@@ -1,6 +1,6 @@
 // G Unit Security — database schema
-// SQLite for local dev. For production, swap datasource provider to postgresql
-// and update DATABASE_URL in env.
+// Postgres for production (Vercel Postgres or any compatible provider).
+// Local dev can either hit a local Postgres instance or a Vercel branch DB.
 
 generator client {
   provider      = "prisma-client-js"
@@ -10,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

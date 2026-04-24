@@ -46,10 +46,7 @@ yarn-error.log*
 # Vercel
 .vercel
 
-# Prisma — SQLite DB file is generated via `npm run db:migrate` (auto-runs seed).
-# Migrations + seed script are the source of truth; DB file stays out of git.
-prisma/dev.db
-prisma/dev.db-journal
+# Prisma — keep any accidental SQLite files out of git
 prisma/*.db
 prisma/*.db-journal
 

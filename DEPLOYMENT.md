@@ -1,24 +1,8 @@
 # Deployment Guide
 
-## ⚠️ SQLite on Vercel — read-only in production
-
-The current setup uses **SQLite** (`prisma/dev.db`) committed into the
-serverless function bundle. That means:
-
-| What | Works on Vercel? |
-|---|---|
-| Public site — home, services, about, contact, career | ✅ Yes (reads) |
-| Admin login + dashboard + viewing content | ✅ Yes (reads) |
-| Admin creating, editing, or deleting content | ❌ **No — writes fail** |
-| Public contact form submissions | ❌ **No — writes fail** |
-| Public career form submissions | ❌ **No — writes fail** |
-
-Vercel's serverless filesystem is **read-only** at runtime. Anything you
-write to `prisma/dev.db` disappears with the next invocation — and most
-of the time the write itself fails because the bundle is read-only.
-
-**To get write-capable production, switch the datasource to Postgres
-(one-click Vercel Postgres) or Turso. See "Upgrading to Postgres" below.**
+The app runs on **Postgres** via Prisma, deployed to **Vercel**.
+Admin CRUD, contact form submissions, and career applications all
+persist because the database lives outside the serverless filesystem.
 
 ---
 
@@ -26,105 +10,111 @@ of the time the write itself fails because the bundle is read-only.
 
 ### 1. Connect the repo
 
-Import the repo in Vercel → pick `claude/review-website-files-Kek9s` or
-whichever branch you merge to `main`.
+Import the repo in Vercel and accept the defaults. Framework should be
+auto-detected as Next.js.
 
-### 2. Set environment variables
+### 2. Provision Vercel Postgres
 
-In Vercel → Project → Settings → Environment Variables, add:
+In the Vercel dashboard:
+
+1. Open the project → **Storage** tab → **Create Database** → **Postgres**.
+2. Pick a name (e.g. `gunit-security-db`), region close to your users.
+3. Vercel automatically sets `DATABASE_URL` (and related `POSTGRES_*`
+   vars) as project environment variables across Production, Preview,
+   and Development. Nothing to copy manually.
+
+### 3. Add the remaining environment variables
+
+Still under **Settings → Environment Variables**, add these four:
 
 | Key | Value | Notes |
 |---|---|---|
-| `DATABASE_URL` | `file:./dev.db` | Relative to `prisma/` |
-| `NEXTAUTH_URL` | `https://your-domain.vercel.app` | Your deployed URL |
-| `NEXTAUTH_SECRET` | generate with `openssl rand -base64 32` | Keep secret |
-| `DEFAULT_ADMIN_EMAIL` | `admin@gunitsecurity.com.au` | Only used on first seed |
-| `DEFAULT_ADMIN_PASSWORD` | a strong password | Only used on first seed |
+| `NEXTAUTH_URL` | `https://<your-domain>` | Full production URL, no trailing slash |
+| `NEXTAUTH_SECRET` | output of `openssl rand -base64 32` | Keep secret |
+| `DEFAULT_ADMIN_EMAIL` | `admin@gunitsecurity.com.au` | Only used by first seed |
+| `DEFAULT_ADMIN_PASSWORD` | a strong password | Only used by first seed |
 
-All five must be present or the build fails.
+Apply each to **Production + Preview + Development**.
 
-### 3. Deploy
+### 4. Deploy
 
-`npm run build` on Vercel runs:
+Push to `main`. Vercel runs:
 
 ```
-prisma generate && prisma migrate deploy && tsx prisma/seed.ts && next build
+prisma generate
+prisma db push --skip-generate --accept-data-loss
+tsx prisma/seed.ts
+next build
 ```
 
-This creates `prisma/dev.db`, applies migrations, seeds the default
-content, and builds Next.js. The `next.config.ts` `outputFileTracingIncludes`
-ships the schema, migrations, and DB file into the serverless functions.
+`db push` syncs the schema to the live Postgres (creates all tables on
+first deploy, no-ops after). Seed is idempotent — it only inserts rows
+that don't already exist, so re-running on every deploy never overwrites
+admin edits.
 
-Seed is idempotent — it only creates rows that don't exist, so re-running
-on deploy won't overwrite admin edits (in environments where edits survive,
-which is not Vercel + SQLite — see above).
+### 5. Log in
 
-### 4. Log in
-
-Visit `/admin/login` with the email and password you set in step 2.
+Go to `/admin/login`, enter the email and password you set in step 3.
 
 ---
 
 ## Local development
 
+### Option A: local Postgres (via Docker)
+
 ```bash
-cp .env.example .env    # then edit DATABASE_URL, NEXTAUTH_SECRET, etc
-npm install
-npm run db:migrate       # creates prisma/dev.db, applies migrations, runs seed
-npm run dev              # http://localhost:3000
+docker run --name gunit-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=gunit -p 5432:5432 -d postgres:16
 ```
 
-Admin: `http://localhost:3000/admin/login`
+Then:
+
+```bash
+cp .env.example .env.local
+# edit .env.local: DATABASE_URL="postgresql://postgres:postgres@localhost:5432/gunit?schema=public"
+npm install
+npm run db:push      # creates all tables
+npm run db:seed      # populates content + default admin
+npm run dev
+```
+
+### Option B: connect to Vercel Postgres dev branch
+
+Vercel Postgres supports branching. Pull the branch credentials with
+`vercel env pull .env.local` and run `npm run dev` — no local DB
+needed.
+
+Visit `http://localhost:3000/admin/login`.
 
 ---
 
-## Upgrading to Postgres (recommended for real production)
+## Schema changes
 
-1. Provision a Postgres DB — on Vercel it's one click: Storage → Create
-   Database → Postgres. Vercel sets `DATABASE_URL` automatically.
-2. Edit `prisma/schema.prisma`:
+This project uses `prisma db push` rather than migration files, which
+is fine for a small, iterating codebase. For every schema change:
 
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-3. Delete the existing SQLite migrations and re-create one for Postgres:
+1. Edit `prisma/schema.prisma`.
+2. `npm run db:push` to apply locally.
+3. Commit both the schema change and any code that depends on it.
+4. Push — Vercel applies `db push` on the next build.
 
-   ```bash
-   rm -rf prisma/migrations prisma/dev.db
-   npx prisma migrate dev --name init
-   ```
-4. Remove the SQLite-specific ignores from `.gitignore` and the
-   `outputFileTracingIncludes` block from `next.config.ts` — both are
-   SQLite-only concerns.
-5. Push and redeploy. Admin edits will now persist; contact and career
-   submissions will work.
-
----
-
-## Upgrading to Turso (SQLite-as-a-service, no provider change)
-
-Turso is remote SQLite with the same Prisma driver. Good if you want to
-keep the SQLite mental model without Postgres.
-
-1. Sign up at turso.tech, create a database, copy the libSQL URL + auth token.
-2. Install driver: `npm install @libsql/client @prisma/adapter-libsql`.
-3. Replace the default Prisma client construction with a Turso adapter —
-   see Prisma docs: https://www.prisma.io/docs/orm/overview/databases/turso
-4. Set `DATABASE_URL` (libsql://...) and `DATABASE_AUTH_TOKEN` on Vercel.
-5. Deploy.
+If you later want migration history, run `npx prisma migrate dev --name <name>`
+after changing the schema. Migration files will be generated; update
+the build script to `prisma migrate deploy` instead of `db push`.
 
 ---
 
 ## Common deploy failures
 
-- **Environment variable not found: DATABASE_URL** — Vercel env vars
-  missing. Add them in project settings.
-- **Error occurred prerendering page** — a page is statically rendered
-  but calls Prisma. Add `export const dynamic = "force-dynamic"` to the
-  offending page or its parent layout.
-- **Prisma Client could not find the binary** — ensure
-  `outputFileTracingIncludes` in `next.config.ts` includes the
-  `prisma/schema.prisma` file (already done in this repo).
+- **`P1012: Environment variable not found: DATABASE_URL`** — Vercel
+  Postgres wasn't provisioned or was deleted. Re-attach via Storage
+  tab.
+- **`P1001: Can't reach database server`** — the DB is paused or the
+  connection string is stale. Check the Postgres instance status in
+  Storage tab.
+- **`Prisma Client could not find the binary`** — ensure
+  `binaryTargets` in `schema.prisma` includes `rhel-openssl-3.0.x`
+  (already set in this repo).
+- **Blank page / prerender error on a public route** — confirm the
+  route has `export const dynamic = "force-dynamic"` or is covered by
+  a parent layout that does (already the case for everything under
+  `(site)`).
