@@ -3,6 +3,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { getSiteSettings } from "@/lib/site-data";
 import { PageHero } from "@/components/shared/PageHero";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { QuoteCalculator } from "@/components/forms/QuoteCalculator";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -113,6 +114,44 @@ export default async function ContactPage() {
                 </p>
               </div>
             </aside>
+          </div>
+
+          {/* AI-assisted quote calculator */}
+          <div className="mt-20">
+            <QuoteCalculator />
+          </div>
+
+          {/* Office map */}
+          <div className="mt-20">
+            <h2 className="font-display text-3xl tracking-wider text-center mb-8">
+              Find <span className="brand-gradient-text">Our Office</span>
+            </h2>
+            <div className="rounded-2xl overflow-hidden border border-white/8 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]">
+              <iframe
+                title="G-Unit Security office on Google Maps"
+                src="https://www.google.com/maps?q=36+Brisbane+Street,+Perth+WA+6000&output=embed"
+                width="100%"
+                height="420"
+                style={{
+                  border: 0,
+                  filter: "invert(92%) hue-rotate(180deg) brightness(0.95) contrast(1.1)",
+                }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+            <p className="text-center text-gray-mid text-sm mt-4">
+              36 Brisbane Street, Perth WA 6000 ·{" "}
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=36+Brisbane+Street+Perth+WA+6000"
+                target="_blank"
+                rel="noreferrer"
+                className="text-gold-bright hover:text-gold-soft underline-offset-4 hover:underline"
+              >
+                Get directions
+              </a>
+            </p>
           </div>
         </div>
       </section>
