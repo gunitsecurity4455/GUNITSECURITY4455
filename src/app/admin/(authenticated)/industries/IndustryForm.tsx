@@ -75,7 +75,12 @@ export function IndustryForm({ initial }: { initial?: Industry }) {
             </label>
           </FormField>
         </div>
-        <ImageUpload label="Feature image" value={imageUrl} onChange={setImageUrl} />
+        <ImageUpload
+          folder="industry"
+          label="Feature image"
+          value={imageUrl}
+          onChange={setImageUrl}
+        />
       </section>
 
       <div className="flex items-center gap-4">

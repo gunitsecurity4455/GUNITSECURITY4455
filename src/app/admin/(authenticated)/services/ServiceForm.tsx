@@ -125,7 +125,12 @@ export function ServiceForm({ initial }: { initial?: Service }) {
           </FormField>
         </div>
 
-        <ImageUpload label="Feature image" value={imageUrl} onChange={setImageUrl} />
+        <ImageUpload
+          folder="service"
+          label="Feature image"
+          value={imageUrl}
+          onChange={setImageUrl}
+        />
       </section>
 
       <div className="flex items-center gap-4">

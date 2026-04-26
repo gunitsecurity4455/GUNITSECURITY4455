@@ -69,7 +69,12 @@ export function HeroSlideForm({ initial }: { initial?: HeroSlide }) {
             </label>
           </FormField>
         </div>
-        <ImageUpload label="Background image" value={imageUrl} onChange={setImageUrl} />
+        <ImageUpload
+          folder="hero"
+          label="Background image"
+          value={imageUrl}
+          onChange={setImageUrl}
+        />
       </section>
 
       <div className="flex items-center gap-4">

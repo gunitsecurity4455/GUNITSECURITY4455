@@ -79,7 +79,12 @@ export function TestimonialForm({ initial }: { initial?: Testimonial }) {
             </label>
           </FormField>
         </div>
-        <ImageUpload label="Avatar" value={avatarUrl} onChange={setAvatarUrl} />
+        <ImageUpload
+          folder="testimonial"
+          label="Avatar"
+          value={avatarUrl}
+          onChange={setAvatarUrl}
+        />
       </section>
 
       <div className="flex items-center gap-4">

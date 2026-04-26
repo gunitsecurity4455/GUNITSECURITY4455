@@ -114,7 +114,7 @@ export function TeamMemberForm({ initial }: { initial?: TeamMember }) {
           </FormField>
         </div>
 
-        <ImageUpload label="Photo" value={photoUrl} onChange={setPhotoUrl} />
+        <ImageUpload folder="team" label="Photo" value={photoUrl} onChange={setPhotoUrl} />
       </section>
 
       <div className="flex items-center gap-4">

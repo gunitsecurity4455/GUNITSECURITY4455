@@ -45,7 +45,7 @@ export function PartnerForm({ initial }: { initial?: Partner }) {
             <input type="number" name="order" defaultValue={initial?.order ?? 0} className={inputClass} />
           </FormField>
         </div>
-        <ImageUpload label="Logo" value={logoUrl} onChange={setLogoUrl} />
+        <ImageUpload folder="partner" label="Logo" value={logoUrl} onChange={setLogoUrl} />
       </section>
 
       <div className="flex items-center gap-4">
