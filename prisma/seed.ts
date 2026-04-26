@@ -399,14 +399,14 @@ async function main() {
     },
     {
       name: "Ali Shehzad",
-      role: "Event Manager",
+      role: "Business Development Director",
       email: "ali.s@gunitsecurity.com.au",
       bio:
-        "Ali leads event security operations — planning, coordinating, and on-the-ground delivery for licensed venues, corporate functions, and large-scale gatherings.",
+        "Ali is responsible for business development, client relationships, and identifying opportunities that drive sustainable growth.",
       responsibilities: [
-        { title: "Event Planning", description: "End-to-end planning for crowd-control and venue contracts." },
-        { title: "On-Site Leadership", description: "Coordinating teams during live events to keep patrons safe." },
-        { title: "Client Liaison", description: "Single point of contact for event organisers before and during shifts." },
+        { title: "Business Growth", description: "Identifying new opportunities and expanding client base." },
+        { title: "Relationship Building", description: "Fostering long-term partnerships built on trust." },
+        { title: "Market Insight", description: "Understanding client needs and delivering tailored solutions." },
       ],
       order: 2,
     },
@@ -552,21 +552,23 @@ async function main() {
     });
   }
 
-  // Update Ali Shehzad's role from Business Development Director → Event Manager.
+  // Revert Ali Shehzad's role to the original PDF capability statement copy:
+  // Business Development Director (he was briefly seeded as Event Manager;
+  // the brief now confirms the original title).
   const aliRow = await prisma.teamMember.findFirst({
-    where: { name: "Ali Shehzad", role: "Business Development Director" },
+    where: { name: "Ali Shehzad", role: "Event Manager" },
   });
   if (aliRow) {
     await prisma.teamMember.update({
       where: { id: aliRow.id },
       data: {
-        role: "Event Manager",
+        role: "Business Development Director",
         bio:
-          "Ali leads event security operations — planning, coordinating, and on-the-ground delivery for licensed venues, corporate functions, and large-scale gatherings.",
+          "Ali is responsible for business development, client relationships, and identifying opportunities that drive sustainable growth.",
         responsibilities: [
-          { title: "Event Planning", description: "End-to-end planning for crowd-control and venue contracts." },
-          { title: "On-Site Leadership", description: "Coordinating teams during live events to keep patrons safe." },
-          { title: "Client Liaison", description: "Single point of contact for event organisers before and during shifts." },
+          { title: "Business Growth", description: "Identifying new opportunities and expanding client base." },
+          { title: "Relationship Building", description: "Fostering long-term partnerships built on trust." },
+          { title: "Market Insight", description: "Understanding client needs and delivering tailored solutions." },
         ],
       },
     });

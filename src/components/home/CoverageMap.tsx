@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Coverage points across Perth metro and WA. Lat/Lng approximate.
 const POINTS = [
   { name: "Perth CBD", lat: -31.9523, lng: 115.8613, focus: "Commercial guarding" },
   { name: "Mirrabooka HQ", lat: -31.8753, lng: 115.8632, focus: "Head office" },
@@ -18,67 +19,32 @@ const POINTS = [
 
 const PERTH_CENTER: [number, number] = [-32.0, 115.86];
 
+const markerIcon = L.divIcon({
+  className: "gunit-marker",
+  html: `<div style="position:relative;width:14px;height:14px;">
+    <span style="position:absolute;inset:0;border-radius:9999px;background:#c8102e;opacity:0.5;"></span>
+    <span style="position:absolute;inset:3px;border-radius:9999px;background:#e63946;border:1px solid rgba(255,255,255,0.8);box-shadow:0 0 12px rgba(230,57,70,0.9);"></span>
+  </div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+});
+
+function FlyTo({ position }: { position: [number, number] | null }) {
+  const map = useMap();
+  if (position) {
+    map.flyTo(position, 12, { duration: 1.2 });
+  }
+  return null;
+}
+
 export function CoverageMap() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [activePoint, setActivePoint] = useState<(typeof POINTS)[number] | null>(POINTS[0]);
+  const [activePoint, setActivePoint] = useState<(typeof POINTS)[number]>(POINTS[0]);
+  const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    let map: import("leaflet").Map | undefined;
-    let cancelled = false;
-
-    (async () => {
-      const L = await import("leaflet");
-      if (cancelled || !containerRef.current) return;
-
-      // Fix default Leaflet icon paths (which would normally 404 when bundled).
-      delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-      });
-
-      map = L.map(containerRef.current, {
-        center: PERTH_CENTER,
-        zoom: 10,
-        zoomControl: false,
-        scrollWheelZoom: false,
-        attributionControl: false,
-      });
-
-      // CartoDB Dark Matter — looks great with our dark theme, free, no API key.
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        maxZoom: 19,
-      }).addTo(map);
-
-      // Custom red glowing markers for our coverage points.
-      const markerIcon = L.divIcon({
-        className: "gunit-marker",
-        html: `
-          <div class="relative">
-            <span class="absolute inset-0 rounded-full bg-[#c8102e] opacity-50 animate-ping"></span>
-            <span class="relative block w-3 h-3 rounded-full bg-[#e63946] border border-white/60 shadow-[0_0_10px_rgba(230,57,70,0.9)]"></span>
-          </div>
-        `,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
-      });
-
-      POINTS.forEach((p) => {
-        const marker = L.marker([p.lat, p.lng], { icon: markerIcon }).addTo(map!);
-        marker.on("click", () => setActivePoint(p));
-        marker.on("mouseover", () => setActivePoint(p));
-      });
-    })();
-
-    return () => {
-      cancelled = true;
-      map?.remove();
-    };
-  }, []);
+  const focus = (p: (typeof POINTS)[number]) => {
+    setActivePoint(p);
+    setFlyTarget([p.lat, p.lng]);
+  };
 
   return (
     <section className="py-32 bg-near-black relative overflow-hidden">
@@ -105,9 +71,34 @@ export function CoverageMap() {
 
         <div className="relative grid lg:grid-cols-[1fr_320px] gap-6 items-stretch">
           <div className="relative h-[440px] md:h-[520px] rounded-2xl overflow-hidden border border-white/8 bg-pure-black">
-            <div ref={containerRef} className="absolute inset-0" />
+            <MapContainer
+              center={PERTH_CENTER}
+              zoom={10}
+              scrollWheelZoom={false}
+              zoomControl={false}
+              attributionControl={false}
+              style={{ height: "100%", width: "100%", background: "#0a0a0c" }}
+            >
+              <TileLayer
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                subdomains="abcd"
+                maxZoom={19}
+              />
+              {POINTS.map((p) => (
+                <Marker
+                  key={p.name}
+                  position={[p.lat, p.lng]}
+                  icon={markerIcon}
+                  eventHandlers={{
+                    click: () => focus(p),
+                    mouseover: () => setActivePoint(p),
+                  }}
+                />
+              ))}
+              <FlyTo position={flyTarget} />
+            </MapContainer>
             <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-gold-accent/15 rounded-2xl" />
-            <p className="absolute bottom-3 right-3 text-[9px] text-off-white/40 z-[400]">
+            <p className="absolute bottom-3 right-3 text-[9px] text-off-white/40 z-[400] pointer-events-none">
               © OpenStreetMap · CartoDB
             </p>
           </div>
@@ -116,23 +107,21 @@ export function CoverageMap() {
             <p className="text-[10px] tracking-[3px] uppercase text-off-white/45 mb-3">
               Active Locations
             </p>
-            {activePoint && (
-              <div className="mb-5">
-                <h3 className="font-display text-3xl tracking-wider gold-gradient-text">
-                  {activePoint.name}
-                </h3>
-                <p className="text-sm text-off-white/65 mt-1.5 font-serif italic">
-                  {activePoint.focus}
-                </p>
-              </div>
-            )}
+            <div className="mb-5">
+              <h3 className="font-display text-3xl tracking-wider gold-gradient-text">
+                {activePoint.name}
+              </h3>
+              <p className="text-sm text-off-white/65 mt-1.5 font-serif italic">
+                {activePoint.focus}
+              </p>
+            </div>
             <ul className="space-y-1 text-sm overflow-y-auto flex-1 pr-1">
               {POINTS.map((p) => {
-                const active = p.name === activePoint?.name;
+                const active = p.name === activePoint.name;
                 return (
                   <li key={p.name}>
                     <button
-                      onClick={() => setActivePoint(p)}
+                      onClick={() => focus(p)}
                       className={`w-full text-left px-3 py-2 rounded-lg transition flex items-center justify-between gap-2 ${
                         active
                           ? "bg-gold-accent/10 border border-gold-accent/30 text-off-white"

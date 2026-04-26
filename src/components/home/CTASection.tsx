@@ -44,7 +44,8 @@ export function CTASection({ settings }: { settings: SiteSettings | null }) {
             )}
             {settings?.address && (
               <span className="inline-flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-red-bright" /> Mirrabooka, WA
+                <MapPin className="w-4 h-4 text-red-bright" />
+                {settings.address.split(",").slice(-2).join(",").trim() || "Perth, WA"}
               </span>
             )}
           </div>
