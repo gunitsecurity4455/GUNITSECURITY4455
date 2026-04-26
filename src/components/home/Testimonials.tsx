@@ -40,9 +40,18 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
                 {t.quote}
               </p>
               <div className="flex items-center gap-3 pt-4 border-t border-navy-light">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-red-primary to-blue-primary flex items-center justify-center font-display text-sm tracking-widest">
-                  {initials(t.name)}
-                </div>
+                {t.avatarUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={t.avatarUrl}
+                    alt={t.name}
+                    className="w-11 h-11 rounded-full object-cover border border-navy-light"
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-red-primary to-blue-primary flex items-center justify-center font-display text-sm tracking-widest">
+                    {initials(t.name)}
+                  </div>
+                )}
                 <div>
                   <h4 className="font-medium text-off-white text-sm">{t.name}</h4>
                   <p className="text-xs text-gray-mid">

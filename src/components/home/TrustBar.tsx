@@ -14,14 +14,24 @@ export function TrustBar({ partners }: { partners: Partner[] }) {
         </p>
         <div className="flex-1 overflow-hidden relative w-full md:w-auto">
           <div className="flex items-center gap-16 animate-[marquee_40s_linear_infinite]">
-            {items.map((p, i) => (
-              <span
-                key={`${p.id}-${i}`}
-                className="font-display text-2xl tracking-[4px] text-off-white/40 hover:text-off-white transition whitespace-nowrap"
-              >
-                {p.name}
-              </span>
-            ))}
+            {items.map((p, i) =>
+              p.logoUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  key={`${p.id}-${i}`}
+                  src={p.logoUrl}
+                  alt={p.name}
+                  className="h-10 w-auto object-contain opacity-70 hover:opacity-100 transition flex-shrink-0"
+                />
+              ) : (
+                <span
+                  key={`${p.id}-${i}`}
+                  className="font-display text-2xl tracking-[4px] text-off-white/40 hover:text-off-white transition whitespace-nowrap"
+                >
+                  {p.name}
+                </span>
+              )
+            )}
           </div>
         </div>
       </div>

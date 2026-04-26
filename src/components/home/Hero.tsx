@@ -18,6 +18,20 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
 
   return (
     <section className="relative min-h-[88vh] flex items-center overflow-hidden grid-bg">
+      {/* Background image — admin-set per slide */}
+      {current?.imageUrl && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={`bg-${current.id}`}
+            src={current.imageUrl}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-cover opacity-50 animate-[fade-up_0.8s_ease]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/70 via-navy-deep/55 to-navy-deep pointer-events-none" />
+        </>
+      )}
       <div className="absolute inset-0 bg-gradient-to-br from-red-primary/10 via-transparent to-blue-primary/10 pointer-events-none" />
 
       {/* Rotating shield background */}
