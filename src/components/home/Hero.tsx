@@ -61,13 +61,36 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
           <AnimatePresence mode="wait">
             <motion.h1
               key={`headline-${current?.id}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              initial="hidden"
+              animate="show"
+              exit={{ opacity: 0, y: -20, transition: { duration: 0.4 } }}
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.04 } },
+              }}
               className="font-display text-7xl sm:text-8xl lg:text-[8.5rem] leading-[0.92] tracking-wider uppercase"
             >
-              {current?.headline ?? "Protecting What Matters"}
+              {(current?.headline ?? "Protecting What Matters").split(" ").map((word, wi) => (
+                <span key={wi} className="inline-block whitespace-nowrap mr-[0.25em]">
+                  {word.split("").map((char, ci) => (
+                    <motion.span
+                      key={`${wi}-${ci}`}
+                      variants={{
+                        hidden: { opacity: 0, y: 36, filter: "blur(8px)" },
+                        show: {
+                          opacity: 1,
+                          y: 0,
+                          filter: "blur(0px)",
+                          transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+                        },
+                      }}
+                      className="inline-block"
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                </span>
+              ))}
             </motion.h1>
           </AnimatePresence>
 

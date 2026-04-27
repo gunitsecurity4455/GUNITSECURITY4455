@@ -51,6 +51,16 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Premium gold text selection */
+::selection {
+  background: var(--color-gold-accent);
+  color: var(--color-pure-black);
+}
+::-moz-selection {
+  background: var(--color-gold-accent);
+  color: var(--color-pure-black);
+}
+
 html,
 body {
   background: var(--color-navy-deep);
