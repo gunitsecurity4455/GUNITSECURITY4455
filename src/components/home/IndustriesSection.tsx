@@ -12,6 +12,10 @@ export function IndustriesSection({ industries }: { industries: Industry[] }) {
           <h2 className="font-display text-5xl sm:text-7xl tracking-wider">
             Trusted Across <span className="brand-gradient-text">Sectors</span>
           </h2>
+          <p className="font-serif italic text-xl text-off-white/65 leading-relaxed">
+            Specialised security solutions tailored to the unique demands of every industry we
+            serve.
+          </p>
         </Reveal>
 
         <RevealStagger
@@ -21,24 +25,42 @@ export function IndustriesSection({ industries }: { industries: Industry[] }) {
           {industries.map((industry, i) => {
             const Icon = resolveIcon(industry.icon);
             return (
-              <div
+              <article
                 key={industry.id}
-                className="group relative card-luxury rounded-2xl p-7 overflow-hidden"
+                className="group relative card-luxury rounded-2xl overflow-hidden min-h-[360px] flex flex-col"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-primary/5 to-transparent pointer-events-none" />
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-primary/25 to-red-primary/10 flex items-center justify-center mb-7 border border-white/8 group-hover:border-gold-accent/40 transition-colors">
-                    <Icon className="w-6 h-6 text-blue-light group-hover:text-gold-bright transition-colors" />
+                {industry.imageUrl ? (
+                  <>
+                    {/* Photo background */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={industry.imageUrl}
+                      alt={industry.title}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-pure-black via-pure-black/75 to-pure-black/20 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-primary/15 to-transparent pointer-events-none" />
+                  </>
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-primary/8 via-transparent to-red-primary/8 pointer-events-none" />
+                )}
+
+                <div className="relative p-7 flex flex-col h-full justify-end z-10">
+                  <div className="w-12 h-12 rounded-xl bg-pure-black/50 backdrop-blur-md flex items-center justify-center mb-5 border border-white/15 group-hover:border-gold-accent/40 transition-colors">
+                    <Icon className="w-5 h-5 text-blue-light group-hover:text-gold-bright transition-colors" />
                   </div>
-                  <p className="text-[10px] tracking-[4px] text-off-white/40 uppercase mb-3">
+                  <p className="text-[10px] tracking-[4px] text-gold-bright/80 uppercase mb-2">
                     {String(i + 1).padStart(2, "0")} / {String(industries.length).padStart(2, "0")}
                   </p>
                   <h3 className="font-display text-2xl tracking-wider mb-3 group-hover:gold-gradient-text transition-all">
                     {industry.title}
                   </h3>
-                  <p className="text-off-white/60 text-sm leading-relaxed">{industry.description}</p>
+                  <p className="text-off-white/75 text-sm leading-relaxed">
+                    {industry.description}
+                  </p>
                 </div>
-              </div>
+              </article>
             );
           })}
         </RevealStagger>
