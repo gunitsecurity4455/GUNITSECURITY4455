@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Premium security services from G Unit Security — VIP protection, crowd control, CCTV, mobile patrols, canine security and more. Perth WA.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function ServicesPage() {
   const [services, settings] = await Promise.all([getPublishedServices(), getSiteSettings()]);
@@ -71,9 +71,24 @@ export default async function ServicesPage() {
                     reversed ? "lg:order-1" : ""
                   }`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-primary/20 via-transparent to-blue-primary/20" />
-                  <div className="absolute inset-0 grid-bg opacity-50" />
-                  <Icon className="relative w-32 h-32 text-red-bright/40" />
+                  {service.imageUrl ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={service.imageUrl}
+                        alt={service.title}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-tr from-pure-black/60 via-transparent to-transparent pointer-events-none" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-primary/20 via-transparent to-blue-primary/20" />
+                      <div className="absolute inset-0 grid-bg opacity-50" />
+                      <Icon className="relative w-32 h-32 text-red-bright/40" />
+                    </>
+                  )}
                 </div>
               </article>
             );

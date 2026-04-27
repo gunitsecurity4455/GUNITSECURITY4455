@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Get in touch with G Unit Security. 24/7 emergency response. Based in Mirrabooka, WA.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export default async function ContactPage() {
   const settings = await getSiteSettings();

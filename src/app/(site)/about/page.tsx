@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "G-Unit Security — privately owned Western Australian security firm focused on operational reliability, strong supervision, and quality recruitment.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 const stats = [
   { value: "Since 2024", label: "Established WA" },

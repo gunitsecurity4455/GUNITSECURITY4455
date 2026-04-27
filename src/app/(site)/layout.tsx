@@ -3,10 +3,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AIChatbot } from "@/components/shared/AIChatbot";
 
-// Footer reads live data from Prisma, so every public page must render
-// at request time — never prerendered at build. Applies to every page
-// under the (site) route group.
-export const dynamic = "force-dynamic";
+// Cache the rendered tree for 60s. Server actions that mutate content
+// call revalidatePath('/', 'layout') so admin edits still appear within
+// a few seconds, but anonymous traffic hits the cache and never blocks
+// on a Prisma round-trip per request. This is the single biggest perf
+// win on the public site — pages used to force-dynamic on every hit.
+export const revalidate = 60;
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (

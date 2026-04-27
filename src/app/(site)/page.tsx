@@ -18,7 +18,7 @@ import {
   getSiteSettings,
 } from "@/lib/site-data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [slides, partners, services, industries, testimonials, team, settings] =

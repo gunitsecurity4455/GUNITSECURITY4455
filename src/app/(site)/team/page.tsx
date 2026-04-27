@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Meet the leadership behind G-Unit Security — director, business development, operations, scheduling and client services.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 type Responsibility = { title?: string; description?: string };
 

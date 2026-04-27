@@ -4,6 +4,8 @@ import { PageHero } from "@/components/shared/PageHero";
 import { SectionLabel } from "@/components/shared/SectionLabel";
 import { ApplicationForm } from "@/components/forms/ApplicationForm";
 
+export const revalidate = 600;
+
 export const metadata: Metadata = {
   title: "Careers",
   description:

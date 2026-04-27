@@ -11,7 +11,27 @@ import { resolveIcon } from "@/lib/icons";
 import { PageHero } from "@/components/shared/PageHero";
 import { CTASection } from "@/components/home/CTASection";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+export const dynamicParams = true;
+
+// Pre-build every published service page at build time — anonymous
+// traffic hits a static HTML file and never waits on Prisma. If the
+// build env can't reach the DB (e.g. sandboxed CI without Neon), we
+// fall back to an empty list and `dynamicParams: true` lets the page
+// render at request time instead.
+export async function generateStaticParams() {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const services = await prisma.service.findMany({
+      where: { published: true },
+      select: { slug: true },
+    });
+    return services.map((s) => ({ slug: s.slug }));
+  } catch (err) {
+    console.warn("[services/[slug]] generateStaticParams skipped:", err);
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -55,6 +75,22 @@ export default async function ServiceDetailPage({
           { label: service.title },
         ]}
       />
+
+      {service.imageUrl && (
+        <section className="relative -mt-8">
+          <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
+            <div className="relative aspect-[16/7] rounded-2xl overflow-hidden border border-white/8 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={service.imageUrl}
+                alt={service.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/40 via-transparent to-transparent pointer-events-none" />
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-20">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 grid lg:grid-cols-3 gap-12">
