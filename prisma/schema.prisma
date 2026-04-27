@@ -57,6 +57,9 @@ model SiteSettings {
   established       String?
   region            String?
   emergencyResponse String?
+  // Google Maps embed / share URL pasted from Google Maps "Share → Embed a map"
+  // or just the share link. Used on /contact to render the map iframe.
+  mapEmbedUrl       String?
   facebookUrl       String?
   instagramUrl      String?
   linkedinUrl       String?

@@ -91,6 +91,18 @@ export function SettingsForm({ initial }: { initial: SiteSettings | null }) {
             />
           </FormField>
         </div>
+        <FormField
+          label="Google Maps Link"
+          error={err.mapEmbedUrl?.[0]}
+          hint="Paste a Google Maps share or embed URL — used as the office map on /contact. Leave blank to fall back to the address auto-embed."
+        >
+          <input
+            name="mapEmbedUrl"
+            defaultValue={initial?.mapEmbedUrl ?? ""}
+            className={inputClass}
+            placeholder="https://www.google.com/maps/place/…  or  https://maps.app.goo.gl/…"
+          />
+        </FormField>
         <FormField label="Address" error={err.address?.[0]}>
           <textarea
             name="address"

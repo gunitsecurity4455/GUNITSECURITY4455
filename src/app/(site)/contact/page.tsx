@@ -12,6 +12,38 @@ export const metadata: Metadata = {
 
 export const revalidate = 600;
 
+/**
+ * Turn whatever the admin pasted into the Map Link field into something
+ * an <iframe> can actually load. Accepts:
+ *   - a full Google Maps embed URL (returned as-is)
+ *   - a Google Maps share URL like /maps/place/... (we append output=embed)
+ *   - a maps.app.goo.gl shortlink (Google handles the redirect inside the iframe)
+ *   - a full <iframe ... src="..."> tag pasted from Google Maps "Share → Embed a map"
+ *     (we extract the src)
+ *   - nothing — fall back to building one from the postal address
+ */
+function resolveMapEmbedUrl(input: string | null | undefined, address: string | null): string {
+  if (input && input.trim()) {
+    const value = input.trim();
+    const iframeMatch = value.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+    if (iframeMatch) return iframeMatch[1];
+    if (value.includes("/maps/embed") || value.includes("output=embed")) {
+      return value;
+    }
+    if (/^https?:\/\//i.test(value)) {
+      const sep = value.includes("?") ? "&" : "?";
+      return `${value}${sep}output=embed`;
+    }
+  }
+  const query = encodeURIComponent(address ?? "Perth WA 6000");
+  return `https://www.google.com/maps?q=${query}&output=embed`;
+}
+
+function directionsUrl(address: string | null): string {
+  const query = encodeURIComponent(address ?? "Perth WA 6000");
+  return `https://www.google.com/maps/dir/?api=1&destination=${query}`;
+}
+
 export default async function ContactPage() {
   const settings = await getSiteSettings();
 
@@ -129,7 +161,7 @@ export default async function ContactPage() {
             <div className="rounded-2xl overflow-hidden border border-white/8 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]">
               <iframe
                 title="G-Unit Security office on Google Maps"
-                src="https://www.google.com/maps?q=36+Brisbane+Street,+Perth+WA+6000&output=embed"
+                src={resolveMapEmbedUrl(settings?.mapEmbedUrl, settings?.address ?? null)}
                 width="100%"
                 height="420"
                 style={{
@@ -142,9 +174,9 @@ export default async function ContactPage() {
               />
             </div>
             <p className="text-center text-gray-mid text-sm mt-4">
-              36 Brisbane Street, Perth WA 6000 ·{" "}
+              {settings?.address ?? "36 Brisbane Street, Perth WA 6000"} ·{" "}
               <a
-                href="https://www.google.com/maps/dir/?api=1&destination=36+Brisbane+Street+Perth+WA+6000"
+                href={directionsUrl(settings?.address ?? null)}
                 target="_blank"
                 rel="noreferrer"
                 className="text-gold-bright hover:text-gold-soft underline-offset-4 hover:underline"
