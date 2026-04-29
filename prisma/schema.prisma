@@ -51,6 +51,8 @@ model SiteSettings {
   // Site logo (PNG with transparent background works best). Used in
   // navbar + footer. Falls back to the text wordmark when null.
   logoUrl           String?
+  // Display height of the site logo in pixels (in both navbar + footer).
+  logoHeight        Int      @default(48)
   phone             String
   email             String
   generalEmail      String?

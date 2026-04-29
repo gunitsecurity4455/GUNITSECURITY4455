@@ -22,7 +22,8 @@ export async function Footer() {
                 <img
                   src={settings.logoUrl}
                   alt={settings.companyName ?? "G-Unit Security"}
-                  className="h-12 w-auto object-contain"
+                  style={{ height: `${settings.logoHeight ?? 48}px` }}
+                  className="w-auto object-contain"
                 />
               ) : (
                 <span className="font-display text-3xl tracking-[3px]">

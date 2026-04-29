@@ -18,9 +18,11 @@ const navLinks = [
 export function Navbar({
   logoUrl,
   companyName,
+  logoHeight = 48,
 }: {
   logoUrl?: string | null;
   companyName?: string | null;
+  logoHeight?: number | null;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -45,14 +47,18 @@ export function Navbar({
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-8 h-[72px] flex items-center justify-between">
+      <div
+        className="max-w-[1400px] mx-auto px-6 lg:px-8 flex items-center justify-between"
+        style={{ minHeight: `${Math.max(72, (logoHeight ?? 48) + 24)}px` }}
+      >
         <Link href="/" className="flex items-center gap-3">
           {logoUrl ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={logoUrl}
               alt={companyName ?? "G-Unit Security"}
-              className="h-10 md:h-12 w-auto object-contain"
+              style={{ height: `${logoHeight ?? 48}px` }}
+              className="w-auto object-contain"
             />
           ) : (
             <span className="font-display text-2xl tracking-[3px]">

@@ -13,11 +13,18 @@ export const revalidate = 60;
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const settings = await getSiteSettings();
+  const headerHeight = Math.max(72, (settings?.logoHeight ?? 48) + 24);
 
   return (
     <div className="flex-1 flex flex-col">
-      <Navbar logoUrl={settings?.logoUrl} companyName={settings?.companyName} />
-      <div className="flex-1 pt-[72px]">{children}</div>
+      <Navbar
+        logoUrl={settings?.logoUrl}
+        companyName={settings?.companyName}
+        logoHeight={settings?.logoHeight}
+      />
+      <div className="flex-1" style={{ paddingTop: `${headerHeight}px` }}>
+        {children}
+      </div>
       <Footer />
       <AIChatbot />
     </div>

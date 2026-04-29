@@ -13,6 +13,7 @@ const initialState: SettingsFormState = { ok: false };
 export function SettingsForm({ initial }: { initial: SiteSettings | null }) {
   const [state, formAction, isPending] = useActionState(updateSettings, initialState);
   const [logoUrl, setLogoUrl] = useState(initial?.logoUrl ?? null);
+  const [logoHeight, setLogoHeight] = useState(initial?.logoHeight ?? 48);
   const err = state.fieldErrors ?? {};
 
   return (
@@ -30,6 +31,40 @@ export function SettingsForm({ initial }: { initial: SiteSettings | null }) {
           recommendedDimensions="1:1 square (transparent PNG)"
           maxSizeMB={1}
         />
+
+        <input type="hidden" name="logoHeight" value={logoHeight} />
+        <FormField
+          label={`Logo display height: ${logoHeight}px`}
+          error={err.logoHeight?.[0]}
+          hint="How tall the logo renders in the navbar + footer. 48px is balanced; bump to 64–80px for a bolder mark."
+        >
+          <input
+            type="range"
+            min={24}
+            max={120}
+            step={2}
+            value={logoHeight}
+            onChange={(e) => setLogoHeight(Number(e.target.value))}
+            className="w-full accent-red-bright"
+          />
+        </FormField>
+
+        {logoUrl && (
+          <div className="bg-navy-deep border border-navy-light rounded-lg p-5">
+            <p className="text-[10px] tracking-[3px] uppercase text-gray-mid mb-3">
+              Live Preview
+            </p>
+            <div className="bg-pure-black border border-white/8 rounded-lg p-4 flex items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logoUrl}
+                alt="Preview"
+                style={{ height: `${logoHeight}px` }}
+                className="w-auto object-contain"
+              />
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="bg-navy-rich border border-navy-light rounded-2xl p-6 space-y-5">
